@@ -1,7 +1,16 @@
+# Build output
 build/
 *.o
 *.out
 *.exe
+
+# Generated executables
 bms
-run_tests
+
+# Generated and temporary files
+*.log
+fault_log.txt
+core
+
+# Editor and IDE settings
 .vscode/
