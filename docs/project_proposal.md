@@ -242,3 +242,39 @@ editing the logic.
    the program shows its severity and faults.
 9. After each action, the program returns to the menu.
 10. **Exit:** the program closes any open files and ends.
+
+## 6. Initial Modules and Planned C Concepts
+
+### 6.1 Initial Modules
+
+| Module | Source File | Header File | Responsibility |
+|---|---|---|---|
+| Main application | main.c | Not applicable | Controls the high-level application flow: shows the menu, calls the selected action and ends the program |
+| Menu | menu.c | menu.h | Displays the menu, reads user input safely and validates menu choices and file names |
+| File handler | file_handler.c | file_handler.h | The only module that opens, reads, writes and closes files: reads the input CSV file and writes the fault log |
+| Parser | parser.c | parser.h | Converts one CSV text line into a reading |
+| Validation | validation.c | validation.h | Checks that a reading is plausible and that time stamps increase |
+| Battery | battery.c | battery.h | Calculates cell statistics, cell imbalance and the State of Charge |
+| Fault | fault.c | fault.h | Checks the limits, assigns severity, decides the contactor state and provides the default limits |
+| Sample store | sample_store.c | sample_store.h | Keeps up to 1000 processed samples in memory and returns them, optionally filtered by severity |
+| Report | report.c | report.h | Formats and prints sample lines, filtered events and the summary report |
+| Shared types | Not applicable | types.h | Declares the shared structures, enumerations, status codes and constants |
+
+### 6.2 Planned C Concepts
+
+| C Concept | Where It Will Be Used | Why It Is Needed |
+|---|---|---|
+| Structures (`struct`, `typedef`) | Reading, limits, cell statistics, stored sample, summary | Groups related values (for example the four cell voltages, current and temperature) into one meaningful unit |
+| Enumerations (`enum`) | Severity, contactor state, status codes, menu choices | Gives fixed categories readable names instead of unexplained numbers |
+| Arrays | Cell voltages, the 1000-sample store, text buffers | Provides fixed-size storage without dynamic memory allocation |
+| Pointers and `const` pointers | Passing structures to functions, returning results through output parameters | Avoids copying data and shows which parameters a function may not change |
+| Functions with return values | Every module | Keeps the program modular, and status codes let the caller detect and handle errors |
+| Multiple source and header files, include guards | All modules | Separates responsibilities, allows separate compilation and allows unit tests to call the C functions |
+| File handling (`fopen`, `fgets`, `fprintf`, `fclose`) | File handler | Reads the CSV data and writes the fault log, with every call checked for failure |
+| String handling and conversion (`strtod`, `strtol`) | Parser and menu | Converts text to numbers and detects invalid input, which avoids unsafe input functions |
+| Bit manipulation (flags and masks) | Fault module | Stores several faults for one sample in a single byte and tests each fault separately |
+| Fixed-width integer types (`stdint.h`) | Time stamps, fault flags | Makes the size of each value explicit, as is usual in embedded code |
+| Preprocessor constants and macros | Number of cells, maximum samples, buffer sizes | Avoids magic numbers and keeps limits in one place |
+| Floating-point arithmetic (`math.h`) | State of Charge, limit comparisons | Handles measured quantities such as voltage, current and temperature, with checks for invalid values |
+| Loops, conditions and `switch` | Menu loop, file processing loop, severity decisions | Controls repetition and decisions throughout the program |
+| `static` functions and file scope | Internal helper functions in each module | Keeps internal details hidden so that only the public functions are visible |
