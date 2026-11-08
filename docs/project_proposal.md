@@ -141,3 +141,50 @@ hardware.
    dynamic memory allocation.
 6. The pack is fixed at 4 cells.
 7. Unit tests are written with Google Test.
+
+## 4. Requirements
+
+### 4.1 Functional Requirements
+
+| ID | Functional Requirement | Priority | Verification Method |
+|---|---|---|---|
+| FR-01 | The system shall load battery measurements from a CSV file and report a clear error if the file is missing, unreadable or has no header line. | High | Test / Demonstration |
+| FR-02 | The system shall parse each data line into a reading containing time, four cell voltages, pack current and temperature. | High | Unit test |
+| FR-03 | The system shall validate each reading and reject it, with the line number and reason, if it is malformed, non-numeric or outside plausible ranges. | High | Unit test / Negative test |
+| FR-04 | The system shall reject a sample whose time stamp is not later than that of the previous valid sample. | Medium | Unit test |
+| FR-05 | The system shall check each cell voltage against warning and critical limits and assign a severity. | High | Unit test |
+| FR-06 | The system shall check the pack temperature against warning and critical limits and assign a severity. | High | Unit test |
+| FR-07 | The system shall check the magnitude of the pack current against warning and critical limits and assign a severity. | High | Unit test |
+| FR-08 | The system shall calculate the cell imbalance and raise a warning when it exceeds the imbalance threshold. | Medium | Unit test |
+| FR-09 | The system shall assign each sample an overall severity equal to the highest severity found. | High | Unit test |
+| FR-10 | The system shall estimate the State of Charge by coulomb counting and keep it between 0 % and 100 %. | High | Unit test |
+| FR-11 | The system shall open the contactor on a critical fault and keep it open for the rest of the run. | High | Unit test / Demonstration |
+| FR-12 | The system shall store up to 1000 processed samples and report an error when this capacity is reached. | Medium | Test |
+| FR-13 | The system shall display a main menu and perform the selected action until the user chooses to exit. | High | Demonstration |
+| FR-14 | The system shall validate menu choices and file names, and ask again after displaying a message when the input is invalid. | High | Negative test / Demonstration |
+| FR-15 | The system shall display the stored events filtered by severity. | Medium | Demonstration |
+| FR-16 | The system shall check a single reading entered by the user and display its severity and faults. | Medium | Demonstration |
+| FR-17 | The system shall write each warning and critical event to a fault log file with its time, severity and cause. | High | Demonstration |
+| FR-18 | The system shall display a summary report with the number of samples read, accepted and rejected, the warning and critical counts, the final State of Charge and the final contactor state. | High | Demonstration |
+
+### 4.2 Non-Functional Requirements
+
+| ID | Non-Functional Requirement | Verification Method |
+|---|---|---|
+| NFR-01 | The source code shall compile without warnings. | Build output |
+| NFR-02 | The project shall use a modular multi-file structure. | Code review |
+| NFR-03 | The application shall handle invalid input without crashing. | Negative testing |
+| NFR-04 | Important functions shall be tested using gTest. | Unit-test output |
+| NFR-05 | The project shall build using a Makefile. | Build demonstration |
+| NFR-06 | The project shall be maintained in a GitHub repository. | Repository review |
+| NFR-07 | All limit values shall be defined in one place so they can be changed without editing the logic. | Code review |
+| NFR-08 | Calculation and decision functions shall not perform file or console input and output, so that they can be unit tested. | Code review |
+| NFR-09 | The program shall use fixed-size arrays and shall not use dynamic memory allocation. | Code review |
+| NFR-10 | User input shall be read with bounded buffers and safe functions only. | Code review |
+| NFR-11 | The code shall follow one consistent naming style and comment standard. | Code review |
+| NFR-12 | The program shall process 1000 samples in less than one second. | Demonstration |
+
+### 4.3 Requirement Traceability
+
+This table links each requirement to its module, function and test. It will be
+completed after the detailed design and the unit-test plan are prepared.
