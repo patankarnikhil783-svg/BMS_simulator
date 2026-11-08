@@ -188,3 +188,57 @@ hardware.
 
 This table links each requirement to its module, function and test. It will be
 completed after the detailed design and the unit-test plan are prepared.
+
+## 5. High-Level Architecture
+
+### 5.1 Architecture Description
+
+The BMS Simulator is a layered console application written in C. Each layer
+has one responsibility and communicates only through functions declared in
+header files.
+
+- **Application interface.** `menu.c` displays the menu and reads the user's
+  input safely. `main.c` contains only the high-level control loop: it asks
+  `menu.c` for a validated choice and calls the module that performs it.
+- **File storage.** `file_handler.c` is the only module that opens, reads,
+  writes and closes files. It reads the input CSV file and writes the fault
+  log.
+- **Data processing.** `parser.c` converts a CSV text line into a reading.
+  `validation.c` checks that the reading is plausible and in time order.
+  `battery.c` calculates cell statistics and the State of Charge. `fault.c`
+  checks the limits, decides the severity and decides the contactor state.
+  These modules do not read files or print, so they can be unit tested.
+- **In-memory storage.** `sample_store.c` keeps up to 1000 processed samples
+  in a fixed-size array, so the user can filter and review them later.
+- **Reports and outputs.** `report.c` formats and prints sample lines,
+  filtered events and the summary report to the console.
+
+Shared data types and constants are declared in one header file, `types.h`.
+All limit values are kept in one structure so they can be changed without
+editing the logic.
+
+### 5.2 Architecture Diagram
+
+![Software Architecture](architecture.png)
+
+### 5.3 High-Level Workflow
+
+1. The user starts the program.
+2. The program displays the main menu.
+3. The user enters a choice. If the choice is invalid, the program shows a
+   message and displays the menu again.
+4. **Load data file:** the user enters a file name. The program opens the file
+   and reports an error if it cannot be read.
+5. **Run simulation:** for each data line, the program parses it, validates it,
+   checks the limits, calculates the cell statistics and the State of Charge,
+   decides the contactor state, stores the result and writes any warning or
+   critical event to the fault log. Invalid lines are rejected with their line
+   number and the reason, and processing continues.
+6. **Show summary:** the program prints the counts, the final State of Charge
+   and the final contactor state.
+7. **Show events by severity:** the user chooses a severity and the program
+   lists the matching stored events.
+8. **Check a single reading:** the user enters the values of one reading and
+   the program shows its severity and faults.
+9. After each action, the program returns to the menu.
+10. **Exit:** the program closes any open files and ends.
